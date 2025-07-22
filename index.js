@@ -2,7 +2,7 @@ import { Command } from 'commander'
 import * as fs from 'fs'
 import * as child_process from 'child_process'
 import * as mp from '@geolonia/osm-miniplanets'
-import { exitCode } from 'process'
+import * as process from 'process'
 
 const getBBox = (tileIndex) => {
   const paddedTileIndex = tileIndex.toString().padStart(2, '0')
@@ -20,23 +20,21 @@ const extractPlanet = (inputFile, tileIndex, outputDir) => {
   // Create output directory if it doesn't exist
   fs.mkdirSync(outputDir, { recursive: true })
 
-  const osmium = child_process.spawn('osmium', [
-    'extract',
-    '--bbox', bbox,
-    '--output', `${outputDir}/planet-${paddedTileIndex}.osm.pbf`,
-    '--set-bounds',
-    inputFile
-  ], {
-    stdio: 'inherit'
-  })
-  osmium.on('close', async (exitCode) => {
-    if (exitCode !== 0) {
-      console.error(`osmium command failed with exit code ${exitCode}`)
-      process.exit(exitCode)
-    } else {
-      console.log(`Extracted tile index ${tileIndex} to ${outputDir}/planet-${tileIndex}.osm.pbf`)
-    }
-  })
+  try {
+    child_process.execFileSync('osmium', [
+      'extract',
+      '--bbox', bbox,
+      '--output', `${outputDir}/planet-${paddedTileIndex}.osm.pbf`,
+      '--set-bounds',
+      inputFile
+    ], {
+      stdio: 'inherit'
+    })
+    console.log(`Extracted tile index ${tileIndex} to ${outputDir}/planet-${paddedTileIndex}.osm.pbf`)
+  } catch (error) {
+    console.error(`Error extracting tile index ${tileIndex}:`, error)
+    process.exit(1)
+  }
 }
 
 const extractAll = (inputFile, outputDir) => {

@@ -8,4 +8,4 @@ COPY package*.json ./
 RUN npm install --production
 COPY . .
 
-CMD ["node", "index.js"]
+CMD ["/app/docker-entrypoint.sh"]

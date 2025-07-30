@@ -26,6 +26,9 @@ const extractPlanet = (inputFile, tileIndex, outputDir) => {
       '--bbox', bbox,
       '--output', `${outputDir}/planet-${paddedTileIndex}.osm.pbf`,
       '--set-bounds',
+      '--clean=uid', '--clean=user',
+      '-s', 'smart',
+      '-S', 'types=multipolygon,route,boundary',
       inputFile
     ], {
       stdio: 'inherit'
